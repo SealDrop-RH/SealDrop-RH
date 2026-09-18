@@ -1,0 +1,23 @@
+# pnpm 10+ reads settings from here rather than from package.json.
+#
+# bufferutil and utf-8-validate are optional native speedups for `ws`, keccak is an optional
+# native hash viem never reaches for (it uses @noble/hashes), and unrs-resolver ships prebuilt
+# platform binaries. All four work without compiling, so none of them runs a build script on
+# install. Listing them explicitly rather than leaving the warning to be re-read every time.
+onlyBuiltDependencies: []
+ignoredBuiltDependencies:
+  - bufferutil
+  - keccak
+  - unrs-resolver
+  - utf-8-validate
+allowBuilds:
+  bufferutil: set this to true or false
+  keccak: set this to true or false
+  unrs-resolver: set this to true or false
+  utf-8-validate: set this to true or false
+
+# pnpm 11 re-runs `pnpm install` before every `pnpm run <script>`. That nested install
+# exits non-zero over the ignored optional builds above even though a top-level install
+# exits clean, which made every script in this package unrunnable. Dependencies are
+# installed explicitly here, so the pre-run check buys nothing.
+verifyDepsBeforeRun: false

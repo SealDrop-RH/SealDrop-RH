@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+build/
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.shots/
+
+# scripts/banner.py imports scripts/brand.py, which is all it takes.
+__pycache__/
+
+# Airdrop snapshots. Regenerated from chain, and can be large.
+snapshots/

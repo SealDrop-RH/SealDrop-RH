@@ -1,0 +1,56 @@
+{
+  "name": "sealdrop-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:copy": "node scripts/check-copy.mjs",
+    "verify": "tsc --noEmit && eslint && vitest run && node scripts/check-copy.mjs && node scripts/check-tokens.mjs",
+    "publish-roots": "node scripts/publish-roots.mjs"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "@openzeppelin/merkle-tree": "^1.0.8",
+    "@phosphor-icons/react": "^2.1.10",
+    "@rainbow-me/rainbowkit": "2.2.11",
+    "@tanstack/react-query": "5.102.8",
+    "gifenc": "^1.0.3",
+    "motion": "^13.2.0",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "upng-js": "^2.1.0",
+    "viem": "2.56.5",
+    "wagmi": "2.19.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/upng-js": "^2.1.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^4",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.0"
+  },
+  "overrides": {
+    "viem": "2.56.5",
+    "wagmi": "2.19.5",
+    "@tanstack/react-query": "5.102.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

@@ -1,0 +1,320 @@
+@import "tailwindcss";
+@import "@rainbow-me/rainbowkit/styles.css";
+
+/* ---------------------------------------------------------------------------
+   SealDrop tokens: "cleared emerald".
+
+   Slate ground leaning teal rather than green, cool hairlines, one emerald accent, so the
+   only thing on a page that actually reads as green is what is locked. It replaced "vault
+   steel" (graphite + orange) after a green, a blue and a gold palette were built as
+   /v1 /v2 /v3 previews and compared on the real landing page. The other two are gone.
+
+   TWO RULES, enforced by eslint, scripts/check-tokens.mjs and test/tokens.test.ts:
+
+   1. This file is the only place a color literal may appear. One exception exists,
+      lib/skins.ts, because satori cannot resolve CSS custom properties and the OG
+      share card needs literal hex. test/tokens.test.ts fails the build if the two
+      ever disagree.
+
+   2. --radius-* and --ease-* are deliberately NOT mapped through @theme. Tailwind v4
+      emits the theme variable even under `inline`, so `@theme inline { --radius-sm:
+      var(--radius-sm) }` compiles to `@layer theme{:root{--radius-sm:var(--radius-sm)}}`,
+      a self-reference that only survives because the block below is unlayered and
+      unlayered beats @layer. (This is live in pons-board's shipped CSS today.)
+      Declaring them here plainly overrides Tailwind's own defaults instead, so
+      `rounded-lg`, `ease-out` and `rounded-[var(--radius-lg)]` all agree, with no
+      cycle to be one refactor away from.
+
+   Adding a second palette later (a light mode, say) is still a matter of one
+   `:root[data-theme="..."]` block overriding the values below. Nothing reads a colour
+   any other way.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #090d0d;
+  --bg-elev: #0e1212;
+  --surface: #131717;
+  --surface-2: #191e1d;
+  --surface-3: #222828;
+
+  /* Cool hairlines. A neutral white rule reads warm and cheap against a dark ground; the
+     teal tint keeps the edge in the same material as the slate. The ground is teal and not
+     green on purpose: green-tinted greys go sage and muddy next to the accent. */
+  --border: rgba(190, 216, 214, 0.1);
+  --border-strong: rgba(190, 216, 214, 0.22);
+
+  --fg: #ebefee;
+  --fg-muted: #9ea6a6;
+  --fg-subtle: #6e7676;
+
+  /* Emerald leaning blue. --positive sits on the other side of pure green, a pale pistachio
+     leaning yellow and much lighter, so "active" and "unlockable" never share a colour. */
+  --accent: #00c275;
+  --accent-fg: #02140c;
+  --accent-dim: rgba(0, 194, 117, 0.12);
+  --accent-line: rgba(0, 194, 117, 0.4);
+
+  --positive: #b4e36b;
+  --positive-dim: rgba(180, 227, 107, 0.12);
+  --negative: #ff6f61;
+  --negative-dim: rgba(255, 111, 97, 0.12);
+  --warn: #f5b02e;
+  --warn-dim: rgba(245, 176, 46, 0.12);
+  --info: #74a8ff;
+  --info-dim: rgba(116, 168, 255, 0.12);
+
+  /* The supply strip reads exactly three purpose-named colors, so retuning the hero
+     for a skin never means editing the canvas drawing code. --supply-free is a faintly
+     violet grey on purpose: lib/strip/draw.ts mixes a little of the locked colour into every
+     free particle, and the violet cancels the green so the field lands neutral on screen. */
+  --supply-free: #4c4b4f;
+  --supply-locked: #00c275;
+  --supply-field: #0e1212;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --ff-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --ff-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --ff-display: var(--ff-sans);
+
+  /* ---- timing. Identical in every skin. See rule 2. ---- */
+  --dur-micro: 120ms;
+  --dur-enter: 200ms;
+  --dur-layout: 340ms;
+  --dur-freeze: 1400ms;
+  --dur-thaw: 700ms;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.1, 1);
+
+  --shadow-1: 0 0 0 1px var(--border);
+  --shadow-2: 0 14px 44px -14px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border);
+}
+
+/* Delete Tailwind's stock palette outright. After this, `bg-red-500` compiles to nothing
+   at all, which is the cheapest possible way to make a hardcoded color visible in review.
+   transparent and currentColor go back in because they are keywords, not colors.
+   --font-* is deliberately NOT reset: the prefix would also swallow --font-weight-*,
+   and font-bold would stop working. */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-line: var(--accent-line);
+  --color-positive: var(--positive);
+  --color-positive-dim: var(--positive-dim);
+  --color-negative: var(--negative);
+  --color-negative-dim: var(--negative-dim);
+  --color-warn: var(--warn);
+  --color-warn-dim: var(--warn-dim);
+  --color-info: var(--info);
+  --color-info-dim: var(--info-dim);
+  --color-supply-free: var(--supply-free);
+  --color-supply-locked: var(--supply-locked);
+
+  --font-sans: var(--ff-sans);
+  --font-mono: var(--ff-mono);
+  --font-display: var(--ff-display);
+}
+
+/* ---------- base ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--ff-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every number, address and hash. Digits must align down a column. */
+.num {
+  font-family: var(--ff-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.display {
+  font-family: var(--ff-display);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--accent-dim);
+  color: var(--fg);
+}
+
+/* ---------- reduced motion ---------- */
+/* A global brake. The supply strip does not rely on this: it swaps renderer entirely,
+   drawing its final composed frame instead of animating toward it. See StripStatic.tsx. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* RainbowKit inherits our shell rather than shipping its own look. */
+[data-rk] {
+  --rk-fonts-body: var(--ff-sans);
+  --rk-radii-modal: var(--radius-lg);
+  --rk-radii-actionButton: var(--radius-md);
+}
+
+/* ---------- the supply strip ---------- */
+.strip-field {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--supply-field);
+  box-shadow: var(--shadow-1);
+  /* A fixed aspect, never a dvh. 100dvh reflows as the mobile URL bar collapses, which
+     would resize the canvas backing store mid-animation and produce a visible hitch. */
+  aspect-ratio: 320 / 96;
+  contain: paint;
+}
+
+@media (min-width: 768px) {
+  .strip-field {
+    aspect-ratio: 1120 / 160;
+  }
+}
+
+.strip-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The hairline that closes around the frozen block. Drawn from the left, following the
+   direction the block assembled in. */
+.strip-seal {
+  position: absolute;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+  border-radius: var(--radius-sm);
+  transform-origin: left center;
+}
+
+/* The time scrubber. Restyled to tokens, and kept uncontrolled so dragging never renders. */
+.scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  /* 44px of vertical hit area even though the track is thin. */
+  height: 44px;
+  background: transparent;
+  cursor: grab;
+}
+
+.scrubber:active {
+  cursor: grabbing;
+}
+
+.scrubber::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border-strong);
+}
+
+.scrubber::-moz-range-track {
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border-strong);
+}
+
+.scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 24px;
+  margin-top: -11px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-dim);
+}
+
+.scrubber::-moz-range-thumb {
+  width: 12px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-dim);
+}
+
+/* ---------- rail badges ---------- */
+.app-live,
+.app-soon {
+  margin-left: auto;
+  padding: 0 0.25rem;
+  font-family: var(--ff-mono);
+  font-size: 8.5px;
+  font-style: normal;
+  letter-spacing: 0.05em;
+}
+
+.app-live {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.app-soon {
+  background: var(--surface-2);
+  color: var(--fg-subtle);
+}
+
+/* ---------- footer wordmark ---------- */
+.footer-wordmark {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -0.22em;
+  z-index: 0;
+  margin: 0;
+  /* Scales with the viewport, so it stays a floor rather than becoming a headline on a
+     narrow screen. */
+  font-size: clamp(3.5rem, 15vw, 13rem);
+  font-weight: 600;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--fg);
+  /* Just legible as a shape and nowhere near readable as text, which is the intent. */
+  opacity: 0.028;
+  pointer-events: none;
+  user-select: none;
+}

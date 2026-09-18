@@ -1,0 +1,54 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+solc = "0.8.28"
+
+# Robinhood Chain runs ArbOS >= 40, so PUSH0, EIP-1153 transient storage and MCOPY are all
+# available. TSTORE is load-bearing here: ReentrancyGuardTransient silently bricks every
+# guarded function on a chain without it, so script/TstoreCanary.s.sol re-confirms support
+# on any chain before these contracts are deployed there.
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+fs_permissions = [{access = "read-write", path = "./deployments"}]
+
+# `block.timestamp` is the ONLY correct time source on Robinhood Chain: block.number reports
+# the L1 height there, not this chain's. Every deadline in these contracts is a timestamp on
+# purpose, so the block-timestamp lint is noise rather than signal.
+[lint]
+exclude_lints = ["block-timestamp"]
+
+[fuzz]
+runs = 512
+
+[invariant]
+runs = 128
+depth = 40
+# The handler bounds every input, so a revert means a real bug rather than a discarded run.
+fail_on_revert = true
+
+[profile.ci.fuzz]
+runs = 10_000
+
+[profile.ci.invariant]
+runs = 512
+depth = 100
+
+[rpc_endpoints]
+robinhood = "${ROBINHOOD_RPC_URL}"
+robinhood_testnet = "${ROBINHOOD_TESTNET_RPC_URL}"
+
+# Blockscout does not require a real key; any non-empty string works.
+[etherscan]
+robinhood = {key = "${BLOCKSCOUT_API_KEY}", url = "https://robinhoodchain.blockscout.com/api", chain = 4663}
+robinhood_testnet = {key = "${BLOCKSCOUT_API_KEY}", url = "https://explorer.testnet.chain.robinhood.com/api", chain = 46630}
+
+[fmt]
+line_length = 110
+tab_width = 4
+bracket_spacing = false
+int_types = "long"
